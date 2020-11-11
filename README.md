@@ -20,7 +20,9 @@ Does this work on real chromebooks ?
 I don't have the answer to this question yet, probably not as LXC needs some kernel configurations which might not be included in standard chromeos kernel -> To be tested.
 
 **Warnings:**
+
 **- Due to a LXC limitation, containers are currently stored in a shared and unencrypted location (/home/root/brioche), all the data stored in the container is therefore accessible to anyone using the laptop. You can keep your personal data in the "Downloads" folder which is shared with chromeos and encrypted.**
+
 **- Brioche runs privileged containers with direct access to everything on your laptop. As such, your containers need to be treated the same way you would treat any linux distro regarding security, notably being careful with what you install on it and keeping it up-to-date, as any exploited vulnerability within the container would provide system wide access to your device.**
 
 ## Install instructions
@@ -38,7 +40,7 @@ Note: To update brioche to a new version, you just need to re-perform step 2. Yo
 ## Usage
 
 Usage:
-brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, shell, stop] <extra arguments>
+brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, shell, stop] \<extra arguments>
 - [app] launches the GUI app with the executable name passed as extra argument (e.g. brioche [container name] app vlc).
 - [cmd] launches the shell command specified as extra argument (e.g. brioche [container name] cmd sudo apt install vlc).
 - [create] creates the specified LXC container."
