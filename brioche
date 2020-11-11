@@ -1,0 +1,438 @@
+#!/bin/bash -i
+
+usage()
+{
+	echo ""
+	echo "Brioche: script to control lxc containers within ChromeOS."
+	echo "Usage: brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, shell, stop] <extra arguments>."
+	echo "- [app] launches the GUI app with the executable name passed as extra argument (e.g. brioche [container name] app vlc)."
+	echo "- [cmd] launches the shell command specified as extra argument (e.g. brioche [container name] cmd sudo apt install vlc)."
+	echo "- [create] creates the specified lxc container."
+	echo "- [destroy] deletes the specified lxc container."
+	echo "- [destop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu)."
+	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions direcory)."
+	echo "- [shell] opens a console session in the lxc container."
+	echo "- [stop] stops the specified lxc container."
+	echo "To list existing containers, use \"sudo lxc-ls --fancy\"."
+}
+
+lxc_fix()
+{
+if ! sudo mountpoint -q /sys/fs/cgroup/systemd; then
+    sudo mkdir -p /sys/fs/cgroup/systemd
+    sudo mount -t cgroup -o none,name=systemd systemd /sys/fs/cgroup/systemd
+fi
+if [ ! -d /usr/local/var/lib/lxc ]; then sudo mkdir $(readlink /usr/local/var/lib/lxc); fi
+if ! sudo mountpoint -q $(readlink /usr/local/var/lib/lxc); then sudo mount -o bind $(readlink /usr/local/var/lib/lxc) $(readlink /usr/local/var/lib/lxc); fi
+sudo mount -o remount,exec,suid $(readlink /usr/local/var/lib/lxc)
+}
+
+set_container_defaults()
+{
+echo "lxc.net.0.type = none" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.cap.drop =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.cgroup.devices.allow = c *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.cgroup.devices.allow = b *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.cgroup.devices.deny =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.mount.entry = / chromeos none rbind,optional,create=dir 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.mount.entry = /dev/fuse dev/fuse none bind,optional,create=file 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+}
+
+fix_groups()
+{
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel sudo >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 28 sudo"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel audio >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 18 audio"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel video >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 27 video"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel usb >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 85 usb"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel input >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 222 input"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel kvm >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 418 kvm"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel cras >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupadd -g 600 cras"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -a -G sudo,audio,video,usb,input,kvm,cras $CONTAINER_USER"
+}
+
+ubuntu()
+{
+CONTAINER_LIBDIR=/usr/lib/x86_64-linux-gnu
+CONTAINER_ALSALIBDIR=/usr/lib/x86_64-linux-gnu/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -l $CONTAINER_USER -d /home/$CONTAINER_USER -m ubuntu"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupmod -n $CONTAINER_USER ubuntu"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd" 
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+mint()
+{
+CONTAINER_LIBDIR=/usr/lib/x86_64-linux-gnu
+CONTAINER_ALSALIBDIR=/usr/lib/x86_64-linux-gnu/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -l $CONTAINER_USER -d /home/$CONTAINER_USER -m ubuntu"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupmod -n $CONTAINER_USER ubuntu"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd" 
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/chronos/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+kali()
+{
+CONTAINER_LIBDIR=/usr/lib/x86_64-linux-gnu
+CONTAINER_ALSALIBDIR=/usr/lib/x86_64-linux-gnu/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+debian()
+{
+CONTAINER_LIBDIR=/usr/lib/x86_64-linux-gnu
+CONTAINER_ALSALIBDIR=/usr/lib/x86_64-linux-gnu/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+archlinux()
+{
+CONTAINER_LIBDIR=/usr/lib64
+CONTAINER_ALSALIBDIR=/usr/lib/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "locale-gen"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'LANG=en_US.UTF-8' > /etc/locale.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman-key --init"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman-key --populate"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman -Syu --noconfirm"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman -S --noconfirm sudo nano xorg-xinit networkmanager alsa-plugins alsa-utils pulseaudio pulseaudio-alsa squashfuse tcl tk xclip xorg-server-xwayland xorg-server-xephyr xorg-xhost base-devel git gtest iniparser libxkbcommon ladspa rust sbc"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+fedora()
+{
+CONTAINER_LIBDIR=/usr/lib64
+CONTAINER_ALSALIBDIR=/usr/lib64/alsa-lib
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf update"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf install sudo nano xorg-x11-xinit NetworkManager alsa-plugins-pulseaudio alsa-utils pulseaudio pulseaudio-utils pulseaudio-module-x11 squashfuse tcl tk xclip wayland-devel xorg-x11-server-Xwayland xorg-x11-server-Xephyr make automake libtool gcc gcc-c++ kernel-devel git gtest iniparser libxkbcommon ladspa rust sbc iniparser-devel speexdsp-devel alsa-lib-devel xcb-util-devel dbus-devel systemd-devel libgbm-devel pixman-devel libxkbcommon-devel sbc-devel ladspa-devel cargo"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel dialout >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
+fix_groups
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
+}
+
+create_distro()
+{
+read -rep $'Which distro do you want to use ? (\"ubuntu\", \"mint\", \"kali\", \"debian\", \"archlinux\" and \"fedora\" variants are currently available)\n' DIST
+if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
+case $DIST in
+  "ubuntu") RELEASE=focal;;
+  "mint") RELEASE=ulyana;;
+  "kali") RELEASE=current;;
+  "debian") RELEASE=buster;;
+  "archlinux") RELEASE=current;;
+  "fedora") RELEASE=33;;
+esac
+sudo lxc-create -t download -n "$CONTAINER" -- -d $DIST -r $RELEASE -a amd64 --no-validate
+set_container_defaults
+sudo lxc-start -n "$CONTAINER"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo $CONTAINER > /etc/containername"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/resolv.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/run/shill/resolv.conf /etc/resolv.conf"
+"$DIST"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "timedatectl set-ntp false"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/localtime"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s \$(readlink /chromeos/var/lib/timezone/localtime) /etc/localtime"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /lib/modules"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "if [ -d /media ]; then rm -r /media; fi"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/media/removable /media"
+}
+
+install_cros_fixes()
+{
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat <<'BASHRC' > ~/.bashrc
+export PS1=\"\[\e[1;34m\](container:\$(cat /etc/containername)) \u@\h \W \\\$\[\e[0m\] \"
+export CLUTTER_BACKEND=x11
+export DBUS_SYSTEM_BUS_ADDRESS=\"unix:path=/var/run/dbus/system_bus_socket\"
+export DISPLAY=:0
+export GDK_BACKEND=x11
+export QT_QPA_PLATFORM=xcb
+export WAYLAND_DISPLAY=wayland-0
+export XDG_SESSION_CLASS=user
+export XDG_RUNTIME_DIR=/var/run/user/1000
+export XDG_SESSION_TYPE=x11
+BASHRC"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.bashrc"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat <<'CROS' | sudo tee /usr/bin/brioche-install >/dev/null 2>&1
+#!/bin/bash
+sudo rm ~/.brioche_*
+cat <<'BASHRC' > ~/.bashrc
+export PS1=\"\[\e[1;34m\](container:\$(cat /etc/containername)) \u@\h \W \\\$\[\e[0m\] \"
+export CLUTTER_BACKEND=x11
+export DBUS_SYSTEM_BUS_ADDRESS=\"unix:path=/var/run/dbus/system_bus_socket\"
+export DISPLAY=:0
+export GDK_BACKEND=x11
+export QT_QPA_PLATFORM=xcb
+export WAYLAND_DISPLAY=wayland-0
+export XDG_SESSION_CLASS=user
+export XDG_RUNTIME_DIR=/var/run/user/1000
+export XDG_SESSION_TYPE=x11
+BASHRC
+chmod 0755 ~/.bashrc
+cat <<'SYSINITSCRIPT' | sudo tee /usr/bin/brioche-sysinit >/dev/null 2>&1
+#!/bin/bash
+for file in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/video*
+do
+    dev=\$(echo \$file | sed 's#/chromeos/dev/##g')
+    if [ -e /chromeos/dev/\$dev ]; then ln -s /chromeos/dev/\$dev /dev/\$dev; fi
+done
+ln -s /chromeos/dev/vboxdrv /dev/vboxdrv
+if [ ! -L /lib/modules/\$(cat /proc/version |  cut -d' ' -f3) ]; then ln -s /chromeos/lib/modules/\$(cat /proc/version |  cut -d' ' -f3) /lib/modules/\$(cat /proc/version |  cut -d' ' -f3); fi
+ln -s /chromeos/media/removable /media/removable
+ln -s /chromeos/var/run/cras /var/run/cras
+ln -s /chromeos/var/run/udev /var/run/udev
+SYSINITSCRIPT
+cat <<'USERINITSCRIPT' | sudo tee /usr/bin/brioche-userinit >/dev/null 2>&1
+#!/bin/bash
+ln -s /chromeos/var/run/chrome/wayland-0 /var/run/user/1000/wayland-0
+USERINITSCRIPT
+sudo chmod 0755 /usr/bin/brioche-sysinit
+sudo chmod 0755 /usr/bin/brioche-userinit
+cat <<'SYSTEMDSYSINIT' | sudo tee /etc/systemd/system/brioche-sysinit.service >/dev/null 2>&1
+[Unit]
+Description=Brioche system init script
+
+[Service]
+ExecStart=/usr/bin/brioche-sysinit
+
+[Install]
+WantedBy=local-fs.target
+SYSTEMDSYSINIT
+cat <<'SYSTEMDUSERINIT' | sudo tee /etc/systemd/user/brioche-userinit.service >/dev/null 2>&1
+[Unit]
+Description=Brioche user init script
+
+[Service]
+ExecStart=/usr/bin/brioche-userinit
+
+[Install]
+WantedBy=basic.target
+SYSTEMDUSERINIT
+sudo systemctl enable brioche-sysinit
+systemctl --user enable brioche-userinit
+cat <<'ALSACFG' > ~/.asoundrc
+pcm.cras {
+    type cras
+    hint {
+        show on
+        description \"Chromium OS Audio Server\"
+    }
+}
+ctl.cras {
+    type cras
+}
+# Default: route all audio through the CRAS plugin.
+pcm.!default {
+    type cras
+    hint {
+        show on
+        description \"Default ALSA Output (currently Chromium OS Audio Server)\"
+    }
+}
+ctl.!default {
+    type cras
+}
+ALSACFG
+mkdir -p ~/.config/pulse
+cat <<'PULSEAUDIOCFG' > ~/.config/pulse/default.pa
+#!/usr/bin/pulseaudio -nF
+# Copyright (c) 2016 The crouton Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Include default configuration first
+.include /etc/pulse/default.pa
+
+# Forward audio to Chromium OS audio server
+load-module module-alsa-sink device=cras sink_name=cras-sink
+load-module module-alsa-source device=cras source_name=cras-source
+set-default-sink cras-sink
+set-default-source cras-source
+PULSEAUDIOCFG
+echo \"autospawn = yes\" > ~/.config/pulse/client.conf
+CRAS_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/adhd | grep refs/heads/release | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
+git clone -b \$CRAS_BRANCH https://chromium.googlesource.com/chromiumos/third_party/adhd
+cd ~/adhd
+GTEST_LIBS=\"libgtest.a libgtest_main.a\" GTEST_CFLAGS=\"-L$CONTAINER_LIBDIR\" CFLAGS=\"-m32 -DCRAS_SOCKET_FILE_DIR=/var/run/cras\" make
+sudo cp ./cras/src/.libs/*.so $CONTAINER_ALSALIBDIR/
+sudo ln -s $CONTAINER_ALSALIBDIR/libcras.so $CONTAINER_LIBDIR/libcras.so.0
+sudo cp ./cras/src/.libs/cras_test_client /usr/bin/
+cd ..
+rm -rf ~/adhd
+curl https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/refs/heads/master.tar.gz -o ~/chromiumos_kernel.tar.gz
+mkdir ~/chromiumos_kernel
+tar zxf ~/chromiumos_kernel.tar.gz -C ~/chromiumos_kernel
+rm ~/chromiumos_kernel.tar.gz
+cd ~/chromiumos_kernel
+make headers_install INSTALL_HDR_PATH=~/linux_headers
+cd ..
+rm -r ~/chromiumos_kernel
+SOMMELIER_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/containers/sommelier.git | grep refs/tags/ | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
+git clone -b \$SOMMELIER_BRANCH https://chromium.googlesource.com/chromiumos/containers/sommelier.git
+cd ~/sommelier
+sed -i \"s#CFLAGS=-g -Wall#CFLAGS=-I../linux_headers/include -g -Wall#g\" Makefile
+make
+sudo cp sommelier /usr/bin/
+cd ..
+rm -rf ~/linux_headers
+rm -rf ~/sommelier
+git clone https://github.com/apenwarr/xclipsync.git -b master
+cd ~/xclipsync
+sudo cp ./xclipfrom /usr/bin/
+sudo chmod 0755 /usr/bin/xclipfrom
+sudo cp ./xclipsync /usr/bin/
+sudo chmod 0755 /usr/bin/xclipsync
+cd ..
+rm -rf ~/xclipsync
+mkdir -p ~/.config/plasma-workspace/env
+echo 'kwin &' > ~/.config/plasma-workspace/env/kwin.sh
+chmod 0755 ~/.config/plasma-workspace/env/kwin.sh
+CROS"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sudo chmod 0755 /usr/bin/brioche-install"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "/usr/bin/brioche-install"
+}
+
+create_container()
+{
+reset
+create_distro
+sudo lxc-attach -n "$CONTAINER" -- bash -c "reset"
+install_cros_fixes
+echo "Input the password for user $CONTAINER_USER:"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "until sudo passwd $CONTAINER_USER; do echo 'Password confirmation does not match, try again'; done"
+sudo lxc-stop -n "$CONTAINER"
+echo "Container created, you can start using it."
+echo "Note: Brioche does not install a desktop by default, install the desktop of your choice."
+}
+
+verify_container()
+{
+if [ ! -d "/usr/local/var/lib/lxc/$CONTAINER" ]; then echo "container $CONTAINER not found"; exit 1; fi
+}
+
+init()
+{
+lxc_fix
+if [ "$(sudo lxc-info -n "$CONTAINER" -s -H)" != "RUNNING" ]; then
+sudo lxc-start -n "$CONTAINER" -q
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "echo $CONTAINER | sudo tee /etc/containername >/dev/null 2>&1"
+sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sudo sed -i "/pam_keyinit.so/d" /etc/pam.d/su-l >/dev/null 2>&1"
+sleep 5
+fi
+}
+
+CONTAINER="$1"
+CONTAINER_COMMAND="$2"
+if [ -z "$CONTAINER_USER" ]; then CONTAINER_USER=$USER; fi
+if [ -z "$CONTAINER_GPU" ]; then CONTAINER_GPU=0; fi
+
+if [ "$CONTAINER_COMMAND" == "app" ]; then
+    verify_container
+    init
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat << COMMAND > ~/.brioche_last_app.sh
+#!/bin/bash
+xhost +
+/usr/bin/start-pulseaudio-x11
+$(echo "${@:3}")
+COMMAND"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.brioche_last_app.sh"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:0 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS ~/.brioche_last_app.sh" >/dev/null 2>&1 &
+elif [ "$CONTAINER_COMMAND" == "cmd" ]; then
+    verify_container
+    init
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat << COMMAND > ~/.brioche_last_cmd.sh
+#!/bin/bash
+$(echo "${@:3}")
+COMMAND"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.brioche_last_cmd.sh"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "~/.brioche_last_cmd.sh"
+elif [ "$CONTAINER_COMMAND" == "create" ]; then
+    if [ -d "/usr/local/var/lib/lxc/$CONTAINER" ]; then echo "container $CONTAINER exist, use destroy command first"; exit 1; fi
+    lxc_fix
+    create_container
+elif [ "$CONTAINER_COMMAND" == "destroy" ]; then
+    verify_container
+    sudo lxc-stop -n "$CONTAINER"
+    sudo lxc-destroy -n "$CONTAINER"
+elif [ "$CONTAINER_COMMAND" == "desktop" ]; then
+    verify_container
+    init
+    if [ -z "$3" ]; then echo "desktop name cannot be empty"; exit 1; fi
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat << COMMAND > ~/.brioche_last_desktop.sh
+#!/bin/bash
+if [ ! -f /usr/share/xsessions/$3.desktop ]; then echo \"desktop $3 not found\"; exit 1; fi
+export DISPLAY=:1
+xclipsync &
+\$(echo \$(cat /usr/share/xsessions/"$3".desktop | grep "^Exec=" | cut -f2- -d=))
+COMMAND"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.brioche_last_desktop.sh"
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:0 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS xinit ~/.brioche_last_desktop.sh -- /usr/bin/Xephyr -resizeable -fullscreen :1" >/dev/null 2>&1 &
+elif [ "$CONTAINER_COMMAND" == "list-desktops" ]; then
+    verify_container
+    init
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "ls /usr/share/xsessions/*.desktop | sed 's#/usr/share/xsessions/##g' | sed 's#\.desktop##g'"
+elif [ "$CONTAINER_COMMAND" == "shell" ]; then
+    verify_container
+    init
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER
+elif [ "$CONTAINER_COMMAND" == "stop" ]; then
+    verify_container
+    sudo lxc-stop -n "$CONTAINER"
+elif [ "$CONTAINER" == "" ] || [ "$CONTAINER_COMMAND" == "" ] || [ "$CONTAINER_COMMAND" == "help" ]; then
+    usage
+else
+    echo "command $CONTAINER_COMMAND not found"
+    usage
+fi
