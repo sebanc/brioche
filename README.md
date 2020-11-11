@@ -53,15 +53,15 @@ brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, she
 
 ## Suggestion to create a first container
 
-Create a container named "mycontainer":
-Run `brioche mycontainer create`
+- Create a container named "mycontainer":
+run `brioche mycontainer create`
 -> Select ubuntu
-once installed:
-Run `brioche mycontainer cmd sudo apt install ubuntu-desktop firefox vlc` to install the ubuntu desktop, firefox and vlc.
-To launch firefox:
-Run `brioche mycontainer app firefox`
-To launch the desktop:
-Run `brioche mycontainer desktop ubuntu`
+- Once installation is finished:
+run `brioche mycontainer cmd sudo apt install ubuntu-desktop firefox vlc` to install the ubuntu desktop, firefox and vlc.
+- To launch firefox:
+run `brioche mycontainer app firefox`
+- To launch the desktop:
+run `brioche mycontainer desktop ubuntu`
 
 ## Main known issues
 
