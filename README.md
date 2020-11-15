@@ -17,7 +17,7 @@ Examples of Brioche use cases:
 - ... you tell me
 
 Does this work on real chromebooks ?
-I don't have the answer to this question yet, probably not as LXC needs some kernel configurations which might not be included in standard chromeos kernel -> To be tested.
+Unfortunately no, it seems some of the needed kernel configs for LXC are only available in the crostini vm kernel and not in the main chromeos one.
 
 **Warnings:**
 
