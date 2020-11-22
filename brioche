@@ -9,7 +9,7 @@ usage()
 	echo "- [cmd] launches the shell command specified as extra argument (e.g. brioche [container name] cmd sudo apt install vlc)."
 	echo "- [create] creates the specified lxc container."
 	echo "- [destroy] deletes the specified lxc container."
-	echo "- [destop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu)."
+	echo "- [desktop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu)."
 	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions direcory)."
 	echo "- [shell] opens a console session in the lxc container."
 	echo "- [stop] stops the specified lxc container."
