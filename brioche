@@ -10,7 +10,7 @@ usage()
 	echo "- [create] creates the specified lxc container."
 	echo "- [destroy] deletes the specified lxc container."
 	echo "- [desktop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu)."
-	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions direcory)."
+	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions directory)."
 	echo "- [shell] opens a console session in the lxc container."
 	echo "- [stop] stops the specified lxc container."
 	echo "To list existing containers, use \"sudo lxc-ls --fancy\"."
