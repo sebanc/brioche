@@ -45,8 +45,8 @@ brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, she
 - [cmd] launches the shell command specified as extra argument (e.g. brioche [container name] cmd sudo apt install vlc).
 - [create] creates the specified LXC container."
 - [destroy] deletes the specified LXC container.
-- [destop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu).
-- [list-desktops] list the desktop sessions currently available in the LXC container (desktop sessions are located in the /usr/share/xsessions direcory).
+- [desktop] launches the desktop specified as extra argument (use [list-desktops] to see which desktops are available) (e.g. brioche [container name] desktop ubuntu).
+- [list-desktops] list the desktop sessions currently available in the LXC container (desktop sessions are located in the /usr/share/xsessions directory).
 - [shell] opens a console session in the LXC container.
 - [stop] stops the specified LXC container.
 "To list existing containers, use directly "sudo lxc-ls --fancy"
