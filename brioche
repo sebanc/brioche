@@ -316,7 +316,6 @@ rm -rf ~/adhd
 SOMMELIER_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/containers/sommelier.git | grep refs/tags/ | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
 git clone -b \$SOMMELIER_BRANCH https://chromium.googlesource.com/chromiumos/containers/sommelier.git
 cd ~/sommelier
-sed -i \"s#CFLAGS=-g -Wall#CFLAGS=-I../linux_headers/include -g -Wall#g\" Makefile
 make
 sudo cp sommelier /usr/bin/
 cd ..
