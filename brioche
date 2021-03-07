@@ -223,11 +223,13 @@ BASHRC
 chmod 0755 ~/.bashrc
 cat <<'SYSINITSCRIPT' | sudo tee /usr/bin/brioche-sysinit >/dev/null 2>&1
 #!/bin/bash
-for file in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/video*
+for file in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/net /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/vfio /chromeos/dev/video*
 do
     dev=\$(echo \$file | sed 's#/chromeos/dev/##g')
+    if [ -d /dev/\$dev ]; then rm -r /dev/\$dev; fi
     if [ -e /chromeos/dev/\$dev ]; then ln -s /chromeos/dev/\$dev /dev/\$dev; fi
 done
+if [ -d /chromeos/dev/vfio ]; then chown $CONTAINER_USER:$CONTAINER_USER /chromeos/dev/vfio/*; fi
 ln -s /chromeos/dev/vboxdrv /dev/vboxdrv
 if [ ! -L /lib/modules/\$(cat /proc/version |  cut -d' ' -f3) ]; then ln -s /chromeos/lib/modules/\$(cat /proc/version |  cut -d' ' -f3) /lib/modules/\$(cat /proc/version |  cut -d' ' -f3); fi
 ln -s /chromeos/media/removable /media/removable
@@ -305,7 +307,7 @@ echo \"autospawn = yes\" > ~/.config/pulse/client.conf
 CRAS_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/adhd | grep refs/heads/release | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
 git clone -b \$CRAS_BRANCH https://chromium.googlesource.com/chromiumos/third_party/adhd
 cd ~/adhd
-GTEST_LIBS=\"libgtest.a libgtest_main.a\" GTEST_CFLAGS=\"-L$CONTAINER_LIBDIR\" CFLAGS=\"-m32 -DCRAS_SOCKET_FILE_DIR=/var/run/cras\" make
+GTEST_LIBS=\"libgtest.a libgtest_main.a\" GTEST_CFLAGS=\"-L$CONTAINER_LIBDIR\" CFLAGS=\"-m32 -DCRAS_SOCKET_FILE_DIR=/var/run/cras\" AM_CFLAGS=\"-Wno-error=stringop-truncation\" make
 sudo cp ./cras/src/.libs/*.so $CONTAINER_ALSALIBDIR/
 sudo ln -s $CONTAINER_ALSALIBDIR/libcras.so $CONTAINER_LIBDIR/libcras.so.0
 sudo cp ./cras/src/.libs/cras_test_client /usr/bin/
