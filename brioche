@@ -313,14 +313,6 @@ sudo ln -s $CONTAINER_ALSALIBDIR/libcras.so $CONTAINER_LIBDIR/libcras.so.0
 sudo cp ./cras/src/.libs/cras_test_client /usr/bin/
 cd ..
 rm -rf ~/adhd
-curl https://chromium.googlesource.com/chromiumos/third_party/kernel/+archive/refs/heads/master.tar.gz -o ~/chromiumos_kernel.tar.gz
-mkdir ~/chromiumos_kernel
-tar zxf ~/chromiumos_kernel.tar.gz -C ~/chromiumos_kernel
-rm ~/chromiumos_kernel.tar.gz
-cd ~/chromiumos_kernel
-make headers_install INSTALL_HDR_PATH=~/linux_headers
-cd ..
-rm -r ~/chromiumos_kernel
 SOMMELIER_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/containers/sommelier.git | grep refs/tags/ | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
 git clone -b \$SOMMELIER_BRANCH https://chromium.googlesource.com/chromiumos/containers/sommelier.git
 cd ~/sommelier
@@ -328,7 +320,6 @@ sed -i \"s#CFLAGS=-g -Wall#CFLAGS=-I../linux_headers/include -g -Wall#g\" Makefi
 make
 sudo cp sommelier /usr/bin/
 cd ..
-rm -rf ~/linux_headers
 rm -rf ~/sommelier
 git clone https://github.com/apenwarr/xclipsync.git -b master
 cd ~/xclipsync
