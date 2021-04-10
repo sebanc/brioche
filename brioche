@@ -307,7 +307,7 @@ echo \"autospawn = yes\" > ~/.config/pulse/client.conf
 CRAS_BRANCH=\$(git ls-remote https://chromium.googlesource.com/chromiumos/third_party/adhd | grep refs/heads/release | tail -1 | awk '{print \$2}' | cut -d\"/\" -f3)
 git clone -b \$CRAS_BRANCH https://chromium.googlesource.com/chromiumos/third_party/adhd
 cd ~/adhd
-GTEST_LIBS=\"libgtest.a libgtest_main.a\" GTEST_CFLAGS=\"-L$CONTAINER_LIBDIR\" CFLAGS=\"-m32 -DCRAS_SOCKET_FILE_DIR=/var/run/cras\" AM_CFLAGS=\"-Wno-error=stringop-truncation\" make
+GTEST_LIBS=\"libgtest.a libgtest_main.a\" GTEST_CFLAGS=\"-L$CONTAINER_LIBDIR\" CFLAGS=\"-m32 -DCRAS_SOCKET_FILE_DIR=/var/run/cras\" AM_CFLAGS=\"-Wno-error=stringop-truncation -Wno-attributes\" make
 sudo cp ./cras/src/.libs/*.so $CONTAINER_ALSALIBDIR/
 sudo ln -s $CONTAINER_ALSALIBDIR/libcras.so $CONTAINER_LIBDIR/libcras.so.0
 sudo cp ./cras/src/.libs/cras_test_client /usr/bin/
