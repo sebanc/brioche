@@ -24,7 +24,7 @@ if ! sudo mountpoint -q /sys/fs/cgroup/systemd; then
 fi
 if [ ! -d /usr/local/var/lib/lxc ]; then sudo mkdir $(readlink /usr/local/var/lib/lxc); fi
 if ! sudo mountpoint -q $(readlink /usr/local/var/lib/lxc); then sudo mount -o bind $(readlink /usr/local/var/lib/lxc) $(readlink /usr/local/var/lib/lxc); fi
-sudo mount -o remount,exec,suid $(readlink /usr/local/var/lib/lxc)
+sudo mount -o remount,exec,suid,symfollow $(readlink /usr/local/var/lib/lxc)
 }
 
 set_container_defaults()
