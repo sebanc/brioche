@@ -223,11 +223,20 @@ BASHRC
 chmod 0755 ~/.bashrc
 cat <<'SYSINITSCRIPT' | sudo tee /usr/bin/brioche-sysinit >/dev/null 2>&1
 #!/bin/bash
-for file in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/net /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/vfio /chromeos/dev/video*
+for dev in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/net /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/vfio /chromeos/dev/video*
 do
-    dev=\$(echo \$file | sed 's#/chromeos/dev/##g')
-    if [ -d /dev/\$dev ]; then rm -r /dev/\$dev; fi
-    if [ -e /chromeos/dev/\$dev ]; then ln -s /chromeos/dev/\$dev /dev/\$dev; fi
+    devname=\$(echo \$dev | sed 's#/chromeos/dev/##g')
+    if [ -d \$dev ]; then
+        if [ -d /dev/\$devname ]; then rm -r /dev/\$devname; fi
+        mkdir /dev/\$devname
+        for file in \$dev/*
+        do
+                subdevname=\$(echo \$file | sed "s#\$dev/##g")
+                ln -s \$dev/\$subdevname /dev/\$devname/\$subdevname
+        done
+    else
+        if [ -e \$dev ]; then ln -s \$dev /dev/\$devname; fi
+    fi
 done
 if [ -d /chromeos/dev/vfio ]; then chown $CONTAINER_USER:$CONTAINER_USER /chromeos/dev/vfio/*; fi
 ln -s /chromeos/dev/vboxdrv /dev/vboxdrv
