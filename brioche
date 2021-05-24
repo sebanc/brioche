@@ -219,6 +219,7 @@ export WAYLAND_DISPLAY=wayland-0
 export XDG_SESSION_CLASS=user
 export XDG_RUNTIME_DIR=/var/run/user/1000
 export XDG_SESSION_TYPE=x11
+export AMD_DEBUG=nodcc
 BASHRC
 chmod 0755 ~/.bashrc
 cat <<'SYSINITSCRIPT' | sudo tee /usr/bin/brioche-sysinit >/dev/null 2>&1
