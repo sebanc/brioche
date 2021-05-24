@@ -168,8 +168,8 @@ create_distro()
 read -rep $'Which distro do you want to use ? (\"ubuntu\", \"mint\", \"kali\", \"debian\", \"archlinux\" and \"fedora\" variants are currently available)\n' DIST
 if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
 case $DIST in
-  "ubuntu") RELEASE=groovy;;
-  "mint") RELEASE=ulyssa;;
+  "ubuntu") RELEASE=focal;;
+  "mint") RELEASE=ulyana;;
   "kali") RELEASE=current;;
   "debian") RELEASE=buster;;
   "archlinux") RELEASE=current;;
