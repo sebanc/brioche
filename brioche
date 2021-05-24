@@ -168,7 +168,7 @@ create_distro()
 read -rep $'Which distro do you want to use ? (\"ubuntu\", \"mint\", \"kali\", \"debian\", \"archlinux\" and \"fedora\" variants are currently available)\n' DIST
 if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
 case $DIST in
-  "ubuntu") RELEASE=hirsute;;
+  "ubuntu") RELEASE=groovy;;
   "mint") RELEASE=ulyssa;;
   "kali") RELEASE=current;;
   "debian") RELEASE=buster;;
@@ -232,7 +232,7 @@ do
         mkdir /dev/\$devname
         for file in \$dev/*
         do
-                subdevname=\$(echo \$file | sed "s#\$dev/##g")
+                subdevname=\$(echo \$file | sed \"s#\$dev/##g\")
                 ln -s \$dev/\$subdevname /dev/\$devname/\$subdevname
         done
     else
