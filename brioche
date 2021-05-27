@@ -154,7 +154,7 @@ CONTAINER_ALSALIBDIR=/usr/lib64/alsa-lib
 sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf update"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf install sudo nano xorg-x11-xinit NetworkManager alsa-plugins-pulseaudio alsa-utils pulseaudio pulseaudio-utils pulseaudio-module-x11 squashfuse tcl tk xclip wayland-devel xorg-x11-server-Xwayland xorg-x11-server-Xephyr make automake libtool gcc gcc-c++ kernel-devel git gtest iniparser libxkbcommon ladspa rust sbc iniparser-devel speexdsp-devel alsa-lib-devel xcb-util-devel dbus-devel systemd-devel libgbm-devel pixman-devel libxkbcommon-devel sbc-devel ladspa-devel cargo"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf install sudo vim-common nano xorg-x11-xinit NetworkManager alsa-plugins-pulseaudio alsa-utils pulseaudio pulseaudio-utils pulseaudio-module-x11 squashfuse tcl tk xclip wayland-devel xorg-x11-server-Xwayland xorg-x11-server-Xephyr make automake libtool gcc gcc-c++ kernel-devel git gtest iniparser libxkbcommon ladspa rust sbc iniparser-devel speexdsp-devel alsa-lib-devel xcb-util-devel dbus-devel systemd-devel libgbm-devel pixman-devel libxkbcommon-devel sbc-devel ladspa-devel cargo"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel dialout >/dev/null 2>&1"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
 fix_groups
@@ -168,8 +168,8 @@ create_distro()
 read -rep $'Which distro do you want to use ? (\"ubuntu\", \"mint\", \"kali\", \"debian\", \"archlinux\" and \"fedora\" variants are currently available)\n' DIST
 if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
 case $DIST in
-  "ubuntu") RELEASE=focal;;
-  "mint") RELEASE=ulyana;;
+  "ubuntu") RELEASE=hirsute;;
+  "mint") RELEASE=ulyssa;;
   "kali") RELEASE=current;;
   "debian") RELEASE=buster;;
   "archlinux") RELEASE=current;;
@@ -181,6 +181,9 @@ sudo lxc-start -n "$CONTAINER"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo $CONTAINER > /etc/containername"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/resolv.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/run/shill/resolv.conf /etc/resolv.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '#!/bin/sh' > /usr/sbin/policy-rc.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'exit 101' >> /usr/sbin/policy-rc.d"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "chmod 755 /usr/sbin/policy-rc.d"
 "$DIST"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "timedatectl set-ntp false"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/localtime"
