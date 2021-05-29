@@ -29,13 +29,14 @@ sudo mount -o remount,exec,suid,symfollow $(readlink /usr/local/var/lib/lxc)
 
 set_container_defaults()
 {
-echo "lxc.net.0.type = none" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cap.drop =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cgroup.devices.allow = c *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cgroup.devices.allow = b *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cgroup.devices.deny =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.mount.auto = proc:rw sys:rw cgroup:mixed" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.mount.entry = / chromeos none rbind,optional,create=dir 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.mount.entry = /dev/fuse dev/fuse none bind,optional,create=file 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.net.0.type = none" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 }
 
 fix_groups()
@@ -181,9 +182,6 @@ sudo lxc-start -n "$CONTAINER"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo $CONTAINER > /etc/containername"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/resolv.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/run/shill/resolv.conf /etc/resolv.conf"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '#!/bin/sh' > /usr/sbin/policy-rc.d"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'exit 101' >> /usr/sbin/policy-rc.d"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "chmod 755 /usr/sbin/policy-rc.d"
 "$DIST"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "timedatectl set-ntp false"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/localtime"
