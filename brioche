@@ -33,7 +33,7 @@ echo "lxc.cap.drop =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >
 echo "lxc.cgroup.devices.allow = c *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cgroup.devices.allow = b *:* rwm" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.cgroup.devices.deny =" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
-echo "lxc.mount.auto = proc:rw sys:rw cgroup:mixed" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
+echo "lxc.mount.auto = proc:mixed sys:mixed cgroup:mixed" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.mount.entry = / chromeos none rbind,optional,create=dir 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.mount.entry = /dev/fuse dev/fuse none bind,optional,create=file 0 0" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
 echo "lxc.net.0.type = none" | sudo tee -a /usr/local/var/lib/lxc/"$CONTAINER"/config >/dev/null 2>&1
