@@ -121,6 +121,7 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit ne
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "touch /home/$CONTAINER_USER/.hushlogin"
 fix_groups
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
