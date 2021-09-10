@@ -413,7 +413,7 @@ xhost +
 $(echo "${@:3}")
 COMMAND"
     sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.brioche_last_app.sh"
-    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:0 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS ~/.brioche_last_app.sh" >/dev/null 2>&1 &
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:1 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS ~/.brioche_last_app.sh" >/dev/null 2>&1 &
 elif [ "$CONTAINER_COMMAND" == "cmd" ]; then
     verify_container
     init
@@ -438,12 +438,12 @@ elif [ "$CONTAINER_COMMAND" == "desktop" ]; then
     sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "cat << COMMAND > ~/.brioche_last_desktop.sh
 #!/bin/bash
 if [ ! -f /usr/share/xsessions/$3.desktop ]; then echo \"desktop $3 not found\"; exit 1; fi
-export DISPLAY=:1
+export DISPLAY=:2
 xclipsync &
 \$(echo \$(cat /usr/share/xsessions/"$3".desktop | grep "^Exec=" | cut -f2- -d=))
 COMMAND"
     sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "chmod 0755 ~/.brioche_last_desktop.sh"
-    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:0 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS xinit ~/.brioche_last_desktop.sh -- /usr/bin/Xephyr -resizeable -fullscreen :1" >/dev/null 2>&1 &
+    sudo lxc-attach -n "$CONTAINER" -- su --login $CONTAINER_USER -c "sommelier -X --x-display=:1 --shm-driver=noop --drm-device=/dev/dri/card$CONTAINER_GPU --glamor $SOMMELIER_ARGS xinit ~/.brioche_last_desktop.sh -- /usr/bin/Xephyr -resizeable -fullscreen :2" >/dev/null 2>&1 &
 elif [ "$CONTAINER_COMMAND" == "list-desktops" ]; then
     verify_container
     init
