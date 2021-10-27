@@ -19,11 +19,8 @@ Examples of Brioche use cases:
 Does this work on real chromebooks ?
 Unfortunately no, it seems some of the needed kernel configs for LXC are only available in the crostini vm kernel and not in the main chromeos one.
 
-**Warnings:**
-
-**- Due to a LXC limitation, containers are currently stored in a shared and unencrypted location (/home/root/brioche), all the data stored in the container is therefore accessible to anyone using the laptop. You can keep your personal data in the "Downloads" folder which is shared with chromeos and encrypted.**
-
-**- Brioche runs privileged containers with direct access to everything on your laptop. As such, your containers need to be treated the same way you would treat any linux distro regarding security, notably being careful with what you install on it and keeping it up-to-date, as any exploited vulnerability within the container would provide system wide access to your device.**
+**Warning:**
+**Brioche runs privileged containers with direct access to everything on your laptop. As such, your containers need to be treated the same way you would treat any linux distro regarding security, notably being careful with what you install on it and keeping it up-to-date, as any exploited vulnerability within the container would provide system wide access to your device.**
 
 ## Install instructions
 
