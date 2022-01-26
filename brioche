@@ -13,7 +13,7 @@ usage()
 	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions directory)."
 	echo "- [shell] opens a console session in the lxc container."
 	echo "- [stop] stops the specified lxc container."
-    echo "- [set_default] sets the default brioche container."
+	echo "- [set_default] sets the default brioche container."
 	echo "To list existing containers, use \"sudo lxc-ls --fancy\"."
 }
 
