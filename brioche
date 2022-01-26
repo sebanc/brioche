@@ -13,6 +13,7 @@ usage()
 	echo "- [list-desktops] list the desktop sessions currently available in the lxc container (desktop sessions are located in the /usr/share/xsessions directory)."
 	echo "- [shell] opens a console session in the lxc container."
 	echo "- [stop] stops the specified lxc container."
+    echo "- [set_default] sets the default brioche container."
 	echo "To list existing containers, use \"sudo lxc-ls --fancy\"."
 }
 
@@ -400,6 +401,16 @@ fi
 
 CONTAINER="$1"
 CONTAINER_COMMAND="$2"
+if [ -z "$CONTAINER_COMMAND" ]; then
+    if [ -z "$BRIOCHE_DEFAULT_CONTAINER" ] then
+        echo "You must specify a default brioche container to use this shortcut"
+        echo "To do this, run 'brioche <container> set_default'"
+        echo "Replacing <container> with your intended default container"
+    else
+        CONTAINER=$BRIOCHE_DEFAULT_CONTAINER;
+        CONTAINER_COMMAND="$1"
+    fi
+fi
 if [ -z "$CONTAINER_USER" ]; then CONTAINER_USER=$USER; fi
 if [ -z "$CONTAINER_GPU" ]; then CONTAINER_GPU=0; fi
 
@@ -431,6 +442,9 @@ elif [ "$CONTAINER_COMMAND" == "destroy" ]; then
     verify_container
     sudo lxc-stop -n "$CONTAINER"
     sudo lxc-destroy -n "$CONTAINER"
+elif [ "$CONTAINER_COMMAND" == "set_default" ]; then
+    verify_container
+    echo "BRIOCHE_DEFAULT_CONTAINER = $CONTAINER" >> ~/.bashrc;
 elif [ "$CONTAINER_COMMAND" == "desktop" ]; then
     verify_container
     init
