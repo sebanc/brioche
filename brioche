@@ -408,7 +408,7 @@ if [ -z "$CONTAINER_COMMAND" ]; then
         echo "Replacing <container> with your intended default container"
     else
         CONTAINER_COMMAND="$1"
-        CONTAINER=$BRIOCHE_DEFAULT_CONTAINER
+        CONTAINER="$BRIOCHE_DEFAULT_CONTAINER"
     fi
 fi
 if [ -z "$CONTAINER_USER" ]; then CONTAINER_USER=$USER; fi
