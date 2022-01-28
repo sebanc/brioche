@@ -4,7 +4,7 @@ usage()
 {
 	echo ""
 	echo "Brioche: script to control lxc containers within ChromeOS."
-	echo "Usage: brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, shell, stop] <extra arguments>."
+	echo "Usage: brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, set_default, shell, stop] <extra arguments>."
 	echo "- [app] launches the GUI app with the executable name passed as extra argument (e.g. brioche [container name] app vlc)."
 	echo "- [cmd] launches the shell command specified as extra argument (e.g. brioche [container name] cmd sudo apt install vlc)."
 	echo "- [create] creates the specified lxc container."
