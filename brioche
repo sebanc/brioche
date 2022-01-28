@@ -402,7 +402,7 @@ fi
 CONTAINER="$1"
 CONTAINER_COMMAND="$2"
 if [ -z "$CONTAINER_COMMAND" ]; then
-    if [ -z "$BRIOCHE_DEFAULT_CONTAINER" ] then
+    if [ -z "$BRIOCHE_DEFAULT_CONTAINER" ]; then
         echo "You must specify a default brioche container to use this shortcut"
         echo "To do this, run 'brioche <container> set_default'"
         echo "Replacing <container> with your intended default container"
