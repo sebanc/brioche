@@ -407,8 +407,8 @@ if [ -z "$CONTAINER_COMMAND" ]; then
         echo "To do this, run 'brioche <container> set_default'"
         echo "Replacing <container> with your intended default container"
     else
-        CONTAINER=$BRIOCHE_DEFAULT_CONTAINER;
         CONTAINER_COMMAND="$1"
+        CONTAINER=$BRIOCHE_DEFAULT_CONTAINER
     fi
 fi
 if [ -z "$CONTAINER_USER" ]; then CONTAINER_USER=$USER; fi
