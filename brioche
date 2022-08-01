@@ -77,9 +77,8 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -l $CONTAINER_USER -d /home/$CONTAINER_USER -m ubuntu"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "groupmod -n $CONTAINER_USER ubuntu"
 fix_groups
@@ -97,9 +96,8 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -l $CONTAINER_USER -d /home/$CONTAINER_USER -m ubuntu"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "groupmod -n $CONTAINER_USER ubuntu"
 fix_groups
@@ -117,9 +115,8 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "touch /home/$CONTAINER_USER/.hushlogin"
 fix_groups
@@ -137,9 +134,8 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
 fix_groups
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
@@ -161,24 +157,6 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman-key --init"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman-key --populate"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman -Syu --noconfirm"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "pacman -S --noconfirm sudo nano xxd xorg-xinit networkmanager alsa-plugins alsa-utils pulseaudio pulseaudio-alsa squashfuse tcl tk xclip xorg-server-xwayland xorg-server-xephyr xorg-xhost base-devel git gtest iniparser libxkbcommon ladspa rust sbc"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
-fix_groups
-sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
-}
-
-fedora()
-{
-CONTAINER_LIBDIR=/usr/lib64
-CONTAINER_ALSALIBDIR=/usr/lib64/alsa-lib
-sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf update"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | dnf install sudo vim-common nano xorg-x11-xinit NetworkManager alsa-plugins-pulseaudio alsa-utils pulseaudio pulseaudio-utils pulseaudio-module-x11 squashfuse tcl tk xclip wayland-devel xorg-x11-server-Xwayland xorg-x11-server-Xephyr make automake libtool gcc gcc-c++ kernel-devel git gtest gmock iniparser libxkbcommon ladspa rust sbc iniparser-devel speexdsp-devel alsa-lib-devel xcb-util-devel dbus-devel systemd-devel libgbm-devel pixman-devel libxkbcommon-devel sbc-devel ladspa-devel cargo"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable NetworkManager.service"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "groupdel dialout >/dev/null 2>&1"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
 fix_groups
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/90-lxd"
@@ -188,22 +166,21 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_US
 
 create_distro()
 {
-read -rep $'Which distro do you want to use ? (\"ubuntu\", \"mint\", \"kali\", \"debian\", \"archlinux\" and \"fedora\" variants are currently available)\n' DIST
+read -rep $'Which distro do you want to use ? (\"debian\", \"archlinux\", \"ubuntu\", \"mint\" and \"kali\" variants are currently available)\n' DIST
 if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
 case $DIST in
-  "ubuntu") RELEASE=impish;;
-  "mint") RELEASE=uma;;
-  "kali") RELEASE=current;;
   "debian") RELEASE=bullseye;;
   "archlinux") RELEASE=current;;
-  "fedora") RELEASE=35;;
+  "ubuntu") RELEASE=jammy;;
+  "mint") RELEASE=una;;
+  "kali") RELEASE=current;;
 esac
 sudo lxc-create -t download -n "$CONTAINER" -- -d $DIST -r $RELEASE -a amd64 --no-validate
 set_container_defaults
 sudo lxc-start -n "$CONTAINER"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo $CONTAINER > /etc/containername"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/resolv.conf"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/run/shill/resolv.conf /etc/resolv.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "rm -f /etc/resolv.conf"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "cp /chromeos/run/shill/resolv.conf /etc/resolv.conf"
 "$DIST"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "timedatectl set-ntp false"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "rm /etc/localtime"
@@ -247,6 +224,8 @@ BASHRC
 chmod 0755 ~/.bashrc
 cat <<'SYSINITSCRIPT' | sudo tee /usr/bin/brioche-sysinit >/dev/null 2>&1
 #!/bin/bash
+rm -f /etc/resolv.conf
+cp /chromeos/run/shill/resolv.conf /etc/resolv.conf
 for dev in /chromeos/dev/block /chromeos/dev/bus /chromeos/dev/char /chromeos/dev/disk /chromeos/dev/dri /chromeos/dev/hid* /chromeos/dev/input /chromeos/dev/kvm /chromeos/dev/loop* /chromeos/dev/mapper /chromeos/dev/mmc* /chromeos/dev/net /chromeos/dev/nvidia* /chromeos/dev/sd* /chromeos/dev/nvme* /chromeos/dev/snd /chromeos/dev/usb /chromeos/dev/v4l* /chromeos/dev/vfio /chromeos/dev/video*
 do
     devname=\$(echo \$dev | sed 's#/chromeos/dev/##g')
@@ -269,11 +248,11 @@ ln -s /chromeos/media/removable /media/removable
 ln -s /chromeos/var/run/cras /var/run/cras
 ln -s /chromeos/var/run/udev /var/run/udev
 SYSINITSCRIPT
+sudo chmod 0755 /usr/bin/brioche-sysinit
 cat <<'USERINITSCRIPT' | sudo tee /usr/bin/brioche-userinit >/dev/null 2>&1
 #!/bin/bash
 ln -s /chromeos/var/run/chrome/wayland-0 /var/run/user/1000/wayland-0
 USERINITSCRIPT
-sudo chmod 0755 /usr/bin/brioche-sysinit
 sudo chmod 0755 /usr/bin/brioche-userinit
 cat <<'SYSTEMDSYSINIT' | sudo tee /etc/systemd/system/brioche-sysinit.service >/dev/null 2>&1
 [Unit]
@@ -297,6 +276,28 @@ WantedBy=basic.target
 SYSTEMDUSERINIT
 sudo systemctl enable brioche-sysinit
 systemctl --user enable brioche-userinit
+cat <<'POLKIT' | sudo tee /etc/polkit-1/localauthority/50-local.d/45-remote-desktop.pkla >/dev/null 2>&1
+[Allow Login, Shutdown, Restart]
+Identity=unix-user:*
+Action=org.freedesktop.login1.*
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+
+[Allow Colord]
+Identity=unix-user:*
+Action=org.freedesktop.color-manager.create-device;org.freedesktop.color-manager.create-profile;org.freedesktop.color-manager.delete-device;org.freedesktop.color-manager.delete-profile;org.freedesktop.color-manager.modify-device;org.freedesktop.color-manager.modify-profile
+ResultAny=no
+ResultInactive=no
+ResultActive=yes
+
+[Allow Package Management]
+Identity=unix-user:*
+Action=org.freedesktop.packagekit.system-sources-refresh
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+POLKIT
 cat <<'ALSACFG' > ~/.asoundrc
 pcm.cras {
     type cras
