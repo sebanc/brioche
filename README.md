@@ -4,7 +4,7 @@
 
 First of all, thanks go to the Crouton maintainers for their work which was actively used when creating this project.
 
-This project consists in providing ChromeOS with an alternative to Crostini and Crouton. It uses the brunch-toolchain as a base which has support for LXC containers. Currently, "ubuntu", "mint", "kali", "debian", "archlinux" and "fedora" containers variants are available.
+This project consists in providing ChromeOS with an alternative to Crostini and Crouton. It uses the brunch-toolchain as a base which has support for LXC containers. Currently, "debian", "archlinux", "ubuntu", "mint" and "kali" containers variants are available.
 
 Why developing this whereas Crostini and Crouton exist ?
 - Crostini uses a VM which makes it slow on some hardware and prevents direct access to devices.
@@ -52,13 +52,13 @@ brioche [container name] [app, cmd, create, destroy, desktop, list-desktops, she
 
 - Create a container named "mycontainer":
 run `brioche mycontainer create`
--> Select ubuntu
+-> Select "debian"
 - Once installation is finished:
-run `brioche mycontainer cmd sudo apt install ubuntu-desktop firefox vlc` to install the ubuntu desktop, firefox and vlc.
+run `brioche mycontainer cmd sudo apt install task-gnome-desktop firefox-esr vlc` to install the gnome desktop, firefox and vlc.
 - To launch firefox:
 run `brioche mycontainer app firefox`
 - To launch the desktop:
-run `brioche mycontainer desktop ubuntu`
+run `brioche mycontainer desktop gnome`
 
 ## Main known issues
 
