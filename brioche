@@ -79,7 +79,7 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev command-not-found"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "usermod -l $CONTAINER_USER -d /home/$CONTAINER_USER -m ubuntu"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "groupmod -n $CONTAINER_USER ubuntu"
@@ -136,7 +136,7 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "mkdir -p /etc/NetworkManager/conf.d"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'unmanaged-devices=interface-name:*' > /etc/NetworkManager/conf.d/disable.conf"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt update"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt dist-upgrade"
-sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev"
+sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt install sudo nano xinit network-manager alsa-utils pulseaudio squashfuse tcl tk xclip xserver-xephyr xwayland build-essential cargo curl git libtool libspeexdsp-dev libasound2-dev libdbus-1-dev libsbc-dev libiniparser-dev ladspa-sdk libsystemd-dev libudev-dev libgtest-dev libgmock-dev rustc diffutils libwayland-dev libegl1-mesa libgles2-mesa libgbm-dev libpixman-1-dev libxcb-composite0-dev libxkbcommon-dev command-not-found"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "yes | apt autoremove"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "sudo useradd -d /home/$CONTAINER_USER -s /bin/bash -m $CONTAINER_USER"
 fix_groups
@@ -174,7 +174,7 @@ case $DIST in
   "debian") RELEASE=bullseye;;
   "archlinux") RELEASE=current;;
   "ubuntu") RELEASE=jammy;;
-  "mint") RELEASE=una;;
+  "mint") RELEASE=vera;;
   "kali") RELEASE=current;;
 esac
 sudo lxc-create -t download -n "$CONTAINER" -- -d $DIST -r $RELEASE -a amd64 --no-validate
