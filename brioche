@@ -71,6 +71,11 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "systemctl disable acpid.path"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "apt-get install -yf"
 }
 
+fix_wifi()
+{
+if [ $(lsmod | grep -c 8821ce) != "0" ]; then sudo lxc-attach -n "$CONTAINER" -- bash -c "echo 'blacklist rtw88_8821ce' >> /etc/modprobe.d/blacklist.conf"; fi
+}
+
 ubuntu()
 {
 CONTAINER_LIBDIR=/usr/lib/x86_64-linux-gnu
@@ -88,6 +93,7 @@ sudo lxc-attach -n "$CONTAINER" -- bash -c "echo '$CONTAINER_USER ALL=(ALL) NOPA
 sudo lxc-attach -n "$CONTAINER" -- bash -c "ln -s /chromeos/home/$CONTAINER_USER/user/Downloads /home/$CONTAINER_USER/Downloads"
 sudo lxc-attach -n "$CONTAINER" -- bash -c "loginctl enable-linger $CONTAINER_USER"
 fix_apt_acpid
+fix_wifi
 }
 
 mint()
