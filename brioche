@@ -174,7 +174,7 @@ case $DIST in
   "debian") RELEASE=bullseye;;
   "archlinux") RELEASE=current;;
   "ubuntu") RELEASE=jammy;;
-  "mint") RELEASE=vera;;
+  "mint") RELEASE=victoria;;
   "kali") RELEASE=current;;
 esac
 sudo lxc-create -t download -n "$CONTAINER" -- -d $DIST -r $RELEASE -a amd64 --no-validate
