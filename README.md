@@ -1,5 +1,7 @@
 # Brioche
 
+**Brioche is not supported since ChromeOS r118 as sudo is not possible in crosh shell anymore.**
+
 ## Overview
 
 First of all, thanks go to the Crouton maintainers for their work which was actively used when creating this project.
