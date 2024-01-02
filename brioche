@@ -171,10 +171,10 @@ create_distro()
 read -rep $'Which distro do you want to use ? (\"debian\", \"archlinux\", \"ubuntu\", \"mint\" and \"kali\" variants are currently available)\n' DIST
 if [ -z $DIST ] || ! ([[ $DIST == "ubuntu" ]] || [[ $DIST == "mint" ]] || [[ $DIST == "kali" ]] || [[ $DIST == "debian" ]] || [[ $DIST == "archlinux" ]] || [[ $DIST == "fedora" ]]); then echo -e "Incorrect choice\n"; create_distro; fi
 case $DIST in
-  "debian") RELEASE=bullseye;;
+  "debian") RELEASE=bookworm;;
   "archlinux") RELEASE=current;;
   "ubuntu") RELEASE=jammy;;
-  "mint") RELEASE=vera;;
+  "mint") RELEASE=victoria;;
   "kali") RELEASE=current;;
 esac
 sudo lxc-create -t download -n "$CONTAINER" -- -d $DIST -r $RELEASE -a amd64 --no-validate
